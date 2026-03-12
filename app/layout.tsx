@@ -1,0 +1,46 @@
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono, Raleway } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import './globals.css'
+
+const _geist = Geist({ subsets: ["latin"] });
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const raleway = Raleway({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-raleway" });
+
+export const metadata: Metadata = {
+  title: 'Hidalsoft - Soluciones Tecnologicas Innovadoras',
+  description: 'Empresa lider en desarrollo de software, consultoria tecnologica y soluciones digitales para empresas.',
+  generator: 'v0.app',
+  icons: {
+    icon: [
+      {
+        url: '/icon-light-32x32.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/icon-dark-32x32.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+      {
+        url: '/icon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
+    apple: '/apple-icon.png',
+  },
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="en" className={raleway.variable}>
+      <body className="font-sans antialiased">
+        {children}
+        <Analytics />
+      </body>
+    </html>
+  )
+}
