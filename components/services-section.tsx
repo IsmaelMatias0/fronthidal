@@ -44,7 +44,7 @@ export function ServicesSection() {
                 <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm">
                   <service.icon className="h-8 w-8" />
                 </div>
-                <CardTitle className="text-xl font-bold text-center">{service.title}</CardTitle>
+                <CardTitle className="text-lg font-bold text-center">{service.title}</CardTitle>
               </CardHeader>
             </Card>
           ))}
