@@ -9,7 +9,7 @@ const raleway = Raleway({ subsets: ["latin"], weight: ["700", "800"], variable: 
 
 export const metadata: Metadata = {
   title: 'Hidalsoft - Soluciones Tecnologicas Innovadoras',
-  description: 'Empresa lider en desarrollo de software, consultoria tecnologica y soluciones digitales para empresas.',
+  description: 'Empresa lider en desarrollo de software, facturación electónica y soluciones digitales para empresas.',
   generator: 'v0.app',
   icons: {
     icon: [
