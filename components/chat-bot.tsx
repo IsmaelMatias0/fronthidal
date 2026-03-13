@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface Message {
     sender: "user" | "bot";
@@ -10,16 +10,24 @@ export default function Chatbot() {
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const webhook = "https://ismaeldev.app.n8n.cloud/webhook/chatbot";
+    const webhook = "https://ismaeldev.app.n8n.cloud/webhook/chatbot2";
+
+    // Auto-scroll al último mensaje
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages, isTyping]);
 
     const sendMessage = async () => {
-        if (!input.trim()) return;
+        if (!input.trim() || isTyping) return;
 
         const userMessage: Message = { sender: "user", text: input };
         setMessages((prev) => [...prev, userMessage]);
         const currentInput = input;
         setInput("");
+        setIsTyping(true);
 
         try {
             const res = await fetch(webhook, {
@@ -34,7 +42,10 @@ export default function Chatbot() {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            const data = await res.json();
+            // ✅ Lectura segura: primero texto, luego parse
+            const rawText = await res.text();
+            const data = rawText ? JSON.parse(rawText) : {};
+
             const botMessage: Message = {
                 sender: "bot",
                 text: data.reply || "Lo siento, no pude procesar tu mensaje.",
@@ -43,10 +54,12 @@ export default function Chatbot() {
             setMessages((prev) => [...prev, botMessage]);
         } catch (error) {
             console.error("Error sending message:", error);
+
             let errorMessageText = "Error de conexión con el servidor.";
 
             if (error instanceof TypeError && error.message === "Failed to fetch") {
-                errorMessageText = "No se pudo conectar con el chatbot. Por favor, asegúrate de que el webhook de n8n esté activo y permita CORS.";
+                errorMessageText =
+                    "No se pudo conectar con el chatbot. Por favor, asegúrate de que el webhook de n8n esté activo y permita CORS.";
             }
 
             const errorMessage: Message = {
@@ -54,6 +67,8 @@ export default function Chatbot() {
                 text: errorMessageText,
             };
             setMessages((prev) => [...prev, errorMessage]);
+        } finally {
+            setIsTyping(false);
         }
     };
 
@@ -85,6 +100,7 @@ export default function Chatbot() {
                             border: "1px solid #e5e7eb",
                         }}
                     >
+                        {/* Header */}
                         <div
                             style={{
                                 padding: "15px",
@@ -111,6 +127,7 @@ export default function Chatbot() {
                             </button>
                         </div>
 
+                        {/* Messages */}
                         <div
                             style={{
                                 flex: 1,
@@ -123,10 +140,18 @@ export default function Chatbot() {
                             }}
                         >
                             {messages.length === 0 && (
-                                <p style={{ color: "#6b7280", textAlign: "center", fontSize: "14px", marginTop: "20px" }}>
+                                <p
+                                    style={{
+                                        color: "#6b7280",
+                                        textAlign: "center",
+                                        fontSize: "14px",
+                                        marginTop: "20px",
+                                    }}
+                                >
                                     ¡Hola! ¿En qué podemos ayudarte hoy?
                                 </p>
                             )}
+
                             {messages.map((m, i) => (
                                 <div
                                     key={i}
@@ -145,8 +170,29 @@ export default function Chatbot() {
                                     {m.text}
                                 </div>
                             ))}
+
+                            {/* ✅ Indicador "Escribiendo..." */}
+                            {isTyping && (
+                                <div
+                                    style={{
+                                        alignSelf: "flex-start",
+                                        background: "#e5e7eb",
+                                        color: "#6b7280",
+                                        padding: "8px 12px",
+                                        borderRadius: "12px",
+                                        fontSize: "14px",
+                                        fontStyle: "italic",
+                                    }}
+                                >
+                                    Escribiendo...
+                                </div>
+                            )}
+
+                            {/* Ancla para auto-scroll */}
+                            <div ref={messagesEndRef} />
                         </div>
 
+                        {/* Input */}
                         <div
                             style={{
                                 display: "flex",
@@ -164,23 +210,27 @@ export default function Chatbot() {
                                     border: "1px solid #d1d5db",
                                     outline: "none",
                                     fontSize: "14px",
+                                    opacity: isTyping ? 0.6 : 1,
                                 }}
                                 placeholder="Escribe un mensaje..."
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                                disabled={isTyping}
                             />
                             <button
                                 onClick={sendMessage}
+                                disabled={isTyping}
                                 style={{
-                                    background: "#007bff",
+                                    background: isTyping ? "#93c5fd" : "#007bff",
                                     color: "white",
                                     border: "none",
                                     padding: "8px 15px",
                                     borderRadius: "20px",
-                                    cursor: "pointer",
+                                    cursor: isTyping ? "not-allowed" : "pointer",
                                     fontWeight: "600",
                                     fontSize: "14px",
+                                    transition: "background 0.2s",
                                 }}
                             >
                                 Enviar
@@ -189,6 +239,7 @@ export default function Chatbot() {
                     </div>
                 )}
 
+                {/* Botón flotante */}
                 <button
                     onClick={() => setOpen(!open)}
                     style={{
