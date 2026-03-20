@@ -11,9 +11,10 @@ export async function POST(req: Request) {
   const body = await req.json()
 
   try {
-    // 1. Insertar en SQL Server
+    // 1. SQL Server + 2. Email — en paralelo para mayor velocidad
     const pool = await getPool()
-    await pool
+
+    const dbPromise = pool
       .request()
       .input("empresa", body.empresa)
       .input("telefono_empresa", body.telefonoEmpresa)
@@ -28,10 +29,7 @@ export async function POST(req: Request) {
            (@empresa, @telefono_empresa, @contacto, @telefono_contacto, @email, @medio)`
       )
 
-    console.log("Registro guardado en SQL Server")
-
-    // 2. Enviar correo de notificación
-    await resend.emails.send({
+    const emailPromise = resend.emails.send({
       from: "Solicitudes Hidalsoft <onboarding@resend.dev>",
       to: "hidalsoft@gmail.com",
       subject: `Nueva solicitud de facturación - ${body.empresa}`,
@@ -66,9 +64,10 @@ export async function POST(req: Request) {
       `,
     })
 
-    console.log("Correo de notificación enviado")
+    await Promise.all([dbPromise, emailPromise])
+    console.log("Registro guardado y correo enviado")
 
-    // 3. Enviar al Google Apps Script (funcionalidad existente)
+    // 3. Enviar al Google Apps Script (fire-and-forget)
     fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
