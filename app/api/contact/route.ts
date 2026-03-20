@@ -5,7 +5,11 @@ import { Resend } from "resend"
 const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbycxoUq1vpxJz7F1rAh6mzcaTgeHCuXEFPI_xm_zSueLM2U0vIb1F-uxo_PKm_NXrr69g/exec"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
+  return _resend
+}
 
 export async function POST(req: Request) {
   const body = await req.json()
@@ -29,7 +33,7 @@ export async function POST(req: Request) {
            (@empresa, @telefono_empresa, @contacto, @telefono_contacto, @email, @medio)`
       )
 
-    const emailPromise = resend.emails.send({
+    const emailPromise = getResend().emails.send({
       from: "Solicitudes Hidalsoft <onboarding@resend.dev>",
       to: "hidalsoft@gmail.com",
       subject: `Nueva solicitud de facturación - ${body.empresa}`,
