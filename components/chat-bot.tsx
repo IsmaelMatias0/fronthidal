@@ -12,6 +12,7 @@ export default function Chatbot() {
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const webhook = "https://ismaeldev.app.n8n.cloud/webhook/chatbot2";
 
@@ -19,6 +20,15 @@ export default function Chatbot() {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, isTyping]);
+
+    // Auto-focus al input cada vez que se abra o termine de cargar el mensaje
+    useEffect(() => {
+        if (open && !isTyping) {
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 50);
+        }
+    }, [open, isTyping]);
 
     const sendMessage = async () => {
         if (!input.trim() || isTyping) return;
@@ -203,6 +213,7 @@ export default function Chatbot() {
                             }}
                         >
                             <input
+                                ref={inputRef}
                                 style={{
                                     flex: 1,
                                     padding: "8px 12px",

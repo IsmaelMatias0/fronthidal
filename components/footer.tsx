@@ -1,4 +1,4 @@
-import { Mail, Phone, Clock, MapPin } from "lucide-react"
+import { Mail, Phone, Clock, MapPin, Instagram } from "lucide-react"
 import Link from "next/link"
 
 const contactInfo = [
@@ -25,6 +25,12 @@ const contactInfo = [
     label: "Dirección",
     value: "Módulo A094, Bella Terra Mall, Santiago, República Dominicana",
     href: "https://www.google.com/maps/place/HIDALSOFT/@19.458095,-70.6870619,17z/data=!3m1!4b1!4m6!3m5!1s0x8eb1c589ac7ed707:0x7962613e922c532d!8m2!3d19.45809!4d-70.684487!16s%2Fg%2F12qh8zh84?entry=ttu&g_ep=EgoyMDI2MDMxMC4wIKXMDSoASAFQAw%3D%3D",
+  },
+  {
+    icon: Instagram,
+    label: "Instagram",
+    value: "@hidalsoftsrl",
+    href: "https://www.instagram.com/hidalsoftsrl?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
   },
 ]
 

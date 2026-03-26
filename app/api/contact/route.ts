@@ -2,8 +2,6 @@ import { NextResponse } from "next/server"
 import { getPool } from "@/lib/db"
 import { Resend } from "resend"
 
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbycxoUq1vpxJz7F1rAh6mzcaTgeHCuXEFPI_xm_zSueLM2U0vIb1F-uxo_PKm_NXrr69g/exec"
 
 let _resend: Resend | null = null
 function getResend() {
@@ -70,14 +68,6 @@ export async function POST(req: Request) {
 
     await Promise.all([dbPromise, emailPromise])
     console.log("Registro guardado y correo enviado")
-
-    // 3. Enviar al Google Apps Script (fire-and-forget)
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      redirect: "follow",
-    }).catch((err) => console.error("Error enviando a Google Script:", err))
 
     return NextResponse.json({ ok: true })
   } catch (error) {
