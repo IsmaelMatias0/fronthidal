@@ -52,7 +52,6 @@ export default function Chatbot() {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            // ✅ Lectura segura: primero texto, luego parse
             const rawText = await res.text();
             const data = rawText ? JSON.parse(rawText) : {};
 
@@ -181,7 +180,6 @@ export default function Chatbot() {
                                 </div>
                             ))}
 
-                            {/* ✅ Indicador "Escribiendo..." */}
                             {isTyping && (
                                 <div
                                     style={{
